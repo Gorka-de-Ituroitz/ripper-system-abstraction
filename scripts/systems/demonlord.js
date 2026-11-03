@@ -36,6 +36,61 @@ export default async function demonlord() {
     perception: "DL.AttributePerception",
   };
 
+  const DEMONLORD_COINS = {
+    gc: { value: 1, label: "DL.WealthCoinsGC", aliases: ["gc"] },
+    ss: { value: 0.1, label: "DL.WealthCoinsSS", aliases: ["ss"] },
+    cp: { value: 0.01, label: "DL.WealthCoinsCP", aliases: ["cp"] },
+    bits: { value: 0.001, label: "DL.WealthCoinsBits", aliases: ["bits", "bit"] },
+  };
+
+  const normalizeUnit = (unit) => unit.toLowerCase().replace(/[\s.:：]+$/u, "").trim();
+
+  const localizedUnit = (key) => {
+    const label = game.i18n.localize(DEMONLORD_COINS[key].label);
+    return label === DEMONLORD_COINS[key].label ? key : normalizeUnit(label);
+  };
+
+  // Localized abbreviations take priority, since they can collide with English ones (e.g. es "CP" is ss).
+  const coinAliases = () => {
+    const aliases = new Map();
+    for (const key of Object.keys(DEMONLORD_COINS)) aliases.set(localizedUnit(key), key);
+    for (const [key, coin] of Object.entries(DEMONLORD_COINS)) {
+      for (const alias of coin.aliases) if (!aliases.has(alias)) aliases.set(alias, key);
+    }
+    return aliases;
+  };
+
+  // Item prices are free-form strings such as "5 ss", "1 gc 5 ss" or "10"; read them as a gc total.
+  const parsePrice = (text) => {
+    if (typeof text === "number") return text;
+    if (typeof text !== "string") return undefined;
+    const aliases = coinAliases();
+    let total = 0;
+    let found = false;
+    for (const [, amount, unit] of text.matchAll(/(\d+(?:\.\d+)?)\s*([^\d\s,;+]*)/gu)) {
+      const key = unit ? aliases.get(normalizeUnit(unit)) : "gc";
+      if (!key) return undefined;
+      total += Number(amount) * DEMONLORD_COINS[key].value;
+      found = true;
+    }
+    return found ? Math.round(total * 1e6) / 1e6 : undefined;
+  };
+
+  // Write a gc total back using the largest coin that represents it as a whole number.
+  const formatPrice = (value) => {
+    const coins = Object.keys(DEMONLORD_COINS);
+    const key = coins.find((k) => {
+      const amount = value / DEMONLORD_COINS[k].value;
+      return Math.abs(amount - Math.round(amount)) < 1e-6;
+    }) ?? coins.at(-1);
+    return `${Math.round(value / DEMONLORD_COINS[key].value)} ${localizedUnit(key)}`;
+  };
+
+  const itemPrice = {
+    get: (item) => parsePrice(item.system.value),
+    set: (item, value) => ({ "system.value": value ? formatPrice(value) : "" }),
+  };
+
   return {
     dataPaths: {
     actor: {
@@ -84,7 +139,7 @@ export default async function demonlord() {
 
       item: {
         single: {
-          value: "",
+          value: itemPrice,
           denomination: "",
         },
 
@@ -92,10 +147,10 @@ export default async function demonlord() {
       },
 
       denominations: {
-        gc: { value: 1 },
-        ss: { value: 0.1 },
-        cp: { value: 0.01 },
-        bits: { value: 0.001 },
+        gc: { value: 1, label: "DL.WealthCoinsGC" },
+        ss: { value: 0.1, label: "DL.WealthCoinsSS" },
+        cp: { value: 0.01, label: "DL.WealthCoinsCP" },
+        bits: { value: 0.001, label: "DL.WealthCoinsBits" },
       },
     },
 
