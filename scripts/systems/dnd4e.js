@@ -135,6 +135,7 @@ export default async function dnd4e() {
     },
     },
     testsInterface: {
+    resultType: "total",
     buildInputs: () => {
       const choices = {};
       const group = {

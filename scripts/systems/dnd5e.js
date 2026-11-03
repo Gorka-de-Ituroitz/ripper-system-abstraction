@@ -156,6 +156,8 @@ export default async function dnd5e() {
     },
     },
     testsInterface: {
+    resultType: "total",
+    supportsAdvantage: true,
     buildInputs: () => {
       const choices = {};
       const group = {
@@ -176,12 +178,15 @@ export default async function dnd5e() {
         choices[`skill.${key}`] = { label: value.label, group: group.skill };
       }
 
+      const tools = Object.entries({ ...CONFIG.DND5E.toolProficiencies, ...CONFIG.DND5E.vehicleTypes })
+        .map(([key, label]) => ({ key, label: game.i18n.localize(label) }));
       for (const [key, entry] of Object.entries(CONFIG.DND5E.tools ?? {})) {
         if (!entry || typeof entry !== "object" || !entry.id) continue;
         const toolId = String(entry.id).split(".").at(-1);
-        const label = toolNames.get(toolId) ?? key;
-        choices[`tool.${key}`] = { label, group: group.tool };
+        tools.push({ key, label: toolNames.get(toolId) ?? key });
       }
+      tools.sort((a, b) => a.label.localeCompare(b.label));
+      for (const { key, label } of tools) choices[`tool.${key}`] = { label, group: group.tool };
 
       class CheckInput extends DND5ECheckInput {
         static defineSchema() {
@@ -201,9 +206,24 @@ export default async function dnd5e() {
       };
     },
 
+    rollInitiative: async (actor, combatant, options = {}) => {
+      const roller = combatant.actor ?? actor;
+      if (options.advantage || options.disadvantage) {
+        roller._cachedInitiativeRoll = roller.getInitiativeRoll({ advantage: !!options.advantage, disadvantage: !!options.disadvantage });
+      }
+      try {
+        await combatant.combat.rollInitiative([combatant.id], { updateTurn: false });
+      } finally {
+        delete roller._cachedInitiativeRoll;
+      }
+    },
+
     processCheck: async (actor, inputs, options = {}) => {
       const [type, key] = inputs.check.split(".");
       const config = { event: options.event };
+      if (options.advantage || options.disadvantage) {
+        config.rolls = [{ options: { advantage: !!options.advantage, disadvantage: !!options.disadvantage } }];
+      }
       const dialog = options.fastForward ? { configure: false } : {};
       const message = options.silent ? { create: false } : {};
 

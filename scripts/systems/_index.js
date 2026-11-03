@@ -94,6 +94,8 @@ class DefaultDCInput extends DataModel {
 }
 
 export const defaultTestsInterface = {
+  resultType: "total",
+
   buildInputs: () => ({
     formula: DefaultFormulaInput,
     dc: DefaultDCInput,

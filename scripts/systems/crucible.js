@@ -142,6 +142,7 @@ export default async function crucible() {
     },
     },
     testsInterface: {
+    resultType: "total",
     buildInputs: () => {
       const choices = {};
 

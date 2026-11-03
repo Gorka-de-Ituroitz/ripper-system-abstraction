@@ -127,6 +127,7 @@ export default async function shadowdark() {
     },
     },
     testsInterface: {
+    resultType: "total",
     buildInputs: () => {
       const choices = {};
 

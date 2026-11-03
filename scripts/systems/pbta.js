@@ -84,6 +84,7 @@ export default async function pbta() {
     },
     },
     testsInterface: {
+    resultType: "outcome",
     buildInputs: () => {
       const choices = {};
 

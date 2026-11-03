@@ -145,6 +145,7 @@ export default async function a5e() {
     },
     },
     testsInterface: {
+    resultType: "total",
     buildInputs: () => {
       const choices = {};
       const group = {
@@ -181,6 +182,8 @@ export default async function a5e() {
         dc: A5EDCInput,
       };
     },
+
+    initiativeOptions: (options = {}) => ({ rollOptions: { skipRollDialog: options.fastForward ?? false } }),
 
     processCheck: async (actor, inputs, options = {}) => {
       const [type, key] = inputs.check.split(".");

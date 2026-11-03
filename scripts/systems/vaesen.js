@@ -84,6 +84,7 @@ export default async function vaesen() {
     },
     },
     testsInterface: {
+    resultType: "successes",
     buildInputs: () => {
       const choices = {};
       const group = {

@@ -121,6 +121,7 @@ export default async function gurps() {
     },
     },
     testsInterface: {
+    resultType: "rollUnder",
     buildInputs: () => {
       const choices = {};
 
@@ -159,14 +160,15 @@ export default async function gurps() {
 
       const bucketWasEmpty = GURPS.ModifierBucket.currentSum() === 0;
       GURPS.lastTargetedRoll = null;
-      const result = await GURPS.performAction(
+      await GURPS.performAction(
         GURPS.parselink(otf).action,
         options.fastForward ? null : actor,
         options.event,
       );
 
+      // performAction returns false for a failed roll too; only a missing roll means it was canceled
       const last = GURPS.lastTargetedRoll;
-      if (!last || result === false) {
+      if (!last) {
         if (bucketWasEmpty) GURPS.ModifierBucket.clear();
         return { canceled: true, result: null, target: null, success: null, levelOfSuccess: null, criticalSuccess: false, criticalFailure: false };
       }

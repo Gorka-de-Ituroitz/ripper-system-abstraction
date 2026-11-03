@@ -113,6 +113,7 @@ export default async function exaltedthird() {
     },
     },
     testsInterface: {
+    resultType: "successes",
     buildInputs: () => {
       const choices = {};
       const group = {

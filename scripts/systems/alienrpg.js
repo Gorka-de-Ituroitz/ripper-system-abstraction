@@ -101,6 +101,8 @@ export default async function alienrpg() {
     },
     },
     testsInterface: {
+    resultType: "successes",
+    initiativeNeedsToken: true,
     buildInputs: () => {
       const choices = {};
       const group = {

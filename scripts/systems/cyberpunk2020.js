@@ -151,6 +151,7 @@ export default async function cyberpunk2020() {
     },
     },
     testsInterface: {
+    resultType: "total",
     buildInputs: () => {
       const choices = {};
       const group = {

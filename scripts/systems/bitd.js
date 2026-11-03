@@ -101,6 +101,7 @@ export default async function bitd() {
     },
 
     testsInterface: {
+      resultType: "outcome",
       buildInputs: () => {
         const choices = {};
         const group = {

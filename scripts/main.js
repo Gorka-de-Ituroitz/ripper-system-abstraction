@@ -2,19 +2,29 @@ import {initConfig} from "./config.js";
 import {showWelcome} from "./lib/welcome.js";
 import { registerSettings } from "./settings.js";
 import "./testsInterfaceCustomElement.js";
-import { buildInputs, parse, processCheck } from "./testsInterfaceCustomElement.js";
+import { buildInputs, getCheckChoices, getResultType, initiativeNeedsToken, parse, processCheck, serialize, supportsAdvantage } from "./testsInterfaceCustomElement.js";
 import { api } from "./api/index.js";
+import { rollInitiative } from "./initiative.js";
 import { runAPITests } from "./testAPI.js";
 import { loadSystem } from "./systems/_index.js";
 
 export const MODULE_ID = "ripper-system-abstraction";
 
+let resolveReady;
+
 export const API = {
     ...api,
+    ready: new Promise((resolve) => (resolveReady = resolve)),
     tests: {
         buildInputs,
+        getResultType,
+        getCheckChoices,
+        supportsAdvantage,
         parse,
+        serialize,
         processCheck,
+        rollInitiative,
+        initiativeNeedsToken,
     },
     debug: {
         openDialog: openTestsDebugDialog,
@@ -30,7 +40,7 @@ Hooks.on("init", () => {
 
 Hooks.on("ready", async () => {
     initConfig();
-    await loadSystem();
+    await loadSystem().finally(() => resolveReady(API));
 });
 
 async function openTestsDebugDialog() {

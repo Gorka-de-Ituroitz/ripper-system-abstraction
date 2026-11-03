@@ -129,6 +129,7 @@ export default async function anarchy() {
     },
     },
     testsInterface: {
+    resultType: "successes",
     buildInputs: () => {
       const choices = {};
       const group = {

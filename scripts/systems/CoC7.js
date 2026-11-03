@@ -109,6 +109,7 @@ export default async function CoC7() {
   },
     },
     testsInterface: {
+  resultType: "rollUnder",
   buildInputs: () => {
     const choices = {};
     const group = {

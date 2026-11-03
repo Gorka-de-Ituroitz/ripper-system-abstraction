@@ -108,6 +108,7 @@ export default async function wildtalents() {
     },
     },
     testsInterface: {
+    resultType: "successes",
     buildInputs: () => {
       const choices = {};
 

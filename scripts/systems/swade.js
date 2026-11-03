@@ -124,6 +124,7 @@ export default async function swade() {
     },
     },
     testsInterface: {
+    resultType: "total",
     buildInputs: () => {
       const choices = {};
 

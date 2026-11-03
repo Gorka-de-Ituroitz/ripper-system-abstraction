@@ -133,6 +133,7 @@ export default async function dsa5() {
     },
     },
     testsInterface: {
+    resultType: "rollUnder",
     buildInputs: () => {
       const choices = {};
       const group = {

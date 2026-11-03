@@ -115,6 +115,15 @@ export default async function demonlord() {
     },
     },
     testsInterface: {
+    resultType: "total",
+    rollInitiative: async (actor, combatant) => {
+      const combat = combatant.combat;
+      if (game.settings.get("demonlord", "optionalRuleInitiativeMode") !== "s") {
+        await combat.rollInitiative([combatant.id], { updateTurn: false });
+        return;
+      }
+      await combat.setInitiative(combatant.id, combat.getInitiativeValue(combatant));
+    },
     buildInputs: () => {
       const choices = {};
 

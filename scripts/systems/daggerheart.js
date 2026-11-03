@@ -116,6 +116,7 @@ export default async function daggerheart() {
     },
     },
     testsInterface: {
+    resultType: "total",
     buildInputs: () => {
       const choices = {};
 

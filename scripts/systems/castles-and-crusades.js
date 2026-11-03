@@ -115,6 +115,7 @@ export default async function castlesAndCrusades() {
     },
     },
     testsInterface: {
+    resultType: "total",
     buildInputs: () => {
       const choices = {};
 

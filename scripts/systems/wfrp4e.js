@@ -174,6 +174,8 @@ export default async function wfrp4e() {
     },
     },
     testsInterface: {
+    resultType: "rollUnder",
+    initiativeNeedsToken: true,
     buildInputs: () => {
       const choices = {};
       const group = {

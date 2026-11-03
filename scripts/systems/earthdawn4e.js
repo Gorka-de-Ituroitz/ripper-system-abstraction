@@ -131,6 +131,7 @@ export default async function earthdawn4e() {
     },
     },
     testsInterface: {
+    resultType: "total",
     buildInputs: () => {
       const choices = {};
 

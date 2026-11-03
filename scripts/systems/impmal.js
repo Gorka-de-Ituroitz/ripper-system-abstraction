@@ -121,6 +121,7 @@ export default async function impmal() {
     },
     },
     testsInterface: {
+    resultType: "rollUnder",
     buildInputs: () => {
       const choices = {};
       const group = {

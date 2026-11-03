@@ -33,8 +33,9 @@ export default async function ars() {
 
   const ARS = game.ars.config;
   const coinValues = ARS.currencyValue[ARS.settings.systemVariant] ?? ARS.currencyValue[0];
+  // Coins count unless stored ("nocarried"): ars creates coins with an empty location state and treats that as carried
   const coinItems = (actor) => actor.items.filter((item) => item.type === "currency"
-    && (actor.type === "lootable" || item.system.location?.state === "carried"));
+    && (actor.type === "lootable" || item.system.location?.state !== "nocarried"));
 
   return {
     dataPaths: {
@@ -98,7 +99,8 @@ export default async function ars() {
               for (const extra of rest) updates.push({ _id: extra.id, "system.quantity": 0 });
             }
             if (updates.length) await actor.updateEmbeddedDocuments("Item", updates);
-            if (Object.keys(create).length) await actor.giveSpecificCurrencies(create);
+            // ars creates one coin type per call
+            for (const [key, amount] of Object.entries(create)) await actor.giveSpecificCurrency(amount, key);
           },
         },
       },
@@ -143,6 +145,7 @@ export default async function ars() {
     },
     },
     testsInterface: {
+    resultType: "total",
     buildInputs: () => {
       const choices = {};
 

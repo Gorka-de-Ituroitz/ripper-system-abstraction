@@ -95,6 +95,7 @@ export default async function deltagreen() {
     },
     },
     testsInterface: {
+    resultType: "rollUnder",
     buildInputs: () => {
       const choices = {};
       const group = {

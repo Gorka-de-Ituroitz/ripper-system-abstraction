@@ -141,6 +141,8 @@ export default async function sfrpg() {
     },
     },
     testsInterface: {
+    resultType: "total",
+    initiativeNeedsToken: true,
     buildInputs: () => {
       const choices = {};
       const group = {

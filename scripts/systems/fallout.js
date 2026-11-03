@@ -91,6 +91,7 @@ export default async function fallout() {
     },
     },
     testsInterface: {
+    resultType: "successes",
     buildInputs: () => {
       const choices = {};
       const group = {

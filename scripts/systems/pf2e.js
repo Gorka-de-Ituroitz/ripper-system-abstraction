@@ -163,6 +163,7 @@ export default async function pf2e() {
     },
     },
     testsInterface: {
+    resultType: "total",
     buildInputs: () => {
       const choices = {};
 

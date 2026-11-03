@@ -115,6 +115,7 @@ export default async function starwarsffg() {
     },
     },
     testsInterface: {
+    resultType: "successes",
     buildInputs: () => {
       const choices = {};
       const group = {

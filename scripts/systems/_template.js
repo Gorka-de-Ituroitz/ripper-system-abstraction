@@ -450,10 +450,18 @@ export default async function systemAdapter() {
 //     fastForward: false,  Whether to skip the system's roll dialog if possible
 //     silent: false,       Whether to suppress chat output for the check
 //     event: null,         An optional originating event passed to the native check
+//     rollMode: null,      A message visibility mode (CONFIG.ChatMessage.modes key)
+//     advantage: false,    Roll with advantage (only when `supportsAdvantage`)
+//     disadvantage: false, Roll with disadvantage (only when `supportsAdvantage`)
 //   }
 //
 // The options object is forwarded to the system's check method when that
 // method accepts an options argument.
+//
+// `rollMode` is applied by the generic layer to the chat messages created by
+// the current user while the check runs; adapters don't need to handle it.
+// The generic layer also adds the produced roll chat message and its rolls to
+// the result (`message`, `rolls`) unless the adapter already set them.
 //
 // When `silent` is set, the generic layer blocks chat messages created by the
 // current user while the check runs, and
@@ -478,6 +486,50 @@ export default async function systemAdapter() {
 //
 
     testsInterface: {
+  /**
+   * What the numeric `result` of a check represents, so consumers can compare
+   * it against thresholds:
+   *   "total"     - a roll total, higher is better (default)
+   *   "rollUnder" - a roll total, lower is better (rolled against `target`)
+   *   "successes" - a count of successes, hits or similar
+   *   "outcome"   - the total is not meaningful; use `levelOfSuccess`
+   */
+  resultType: "total",
+
+  /**
+   * Whether `processCheck` (and initiative) honor the `advantage` and
+   * `disadvantage` options.
+   */
+  supportsAdvantage: false,
+
+  /**
+   * Optional. Extra options for the system's `Combat#rollInitiative` when the
+   * API rolls initiative, from the initiative options (`fastForward`,
+   * `advantage`, ...), e.g. to skip the system's roll dialog.
+   *
+   * @param {Object} options
+   * @returns {Object}
+   */
+  // initiativeOptions: (options) => ({}),
+
+  /**
+   * Optional. Replaces the initiative roll the API performs through
+   * `Combat#rollInitiative`; it must set the combatant's initiative.
+   *
+   * @param {Actor} actor
+   * @param {Combatant} combatant
+   * @param {Object} options
+   * @returns {Promise<void>}
+   */
+  // rollInitiative: async (actor, combatant, options) => {},
+
+  /**
+   * Optional. True when the system's combat code fails on combatants without a
+   * token: rolling initiative for an actor with no token on the scene then
+   * throws instead of creating a tokenless combatant.
+   */
+  // initiativeNeedsToken: false,
+
   /**
    * Returns the DataModel classes required to build a system check.
    *

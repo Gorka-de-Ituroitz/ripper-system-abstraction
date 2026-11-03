@@ -12,6 +12,58 @@ export function buildInputs() {
 }
 
 /**
+ * What the numeric `result` of a check represents for the loaded game system:
+ * "total", "rollUnder", "successes" or "outcome".
+ *
+ * @returns {string}
+ */
+export function getResultType() {
+  return getTestsInterface().resultType ?? "total";
+}
+
+/**
+ * Whether the loaded game system honors the `advantage` and `disadvantage`
+ * check options.
+ *
+ * @returns {boolean}
+ */
+export function supportsAdvantage() {
+  return !!getTestsInterface().supportsAdvantage;
+}
+
+/**
+ * Whether the loaded game system needs an actor's token on the scene to roll
+ * its initiative (see `rollInitiative`).
+ *
+ * @returns {boolean}
+ */
+export function initiativeNeedsToken() {
+  return !!getTestsInterface().initiativeNeedsToken;
+}
+
+/**
+ * The checks the loaded game system offers through its `check` input, as a
+ * flat list. Empty when the system has no `check` input.
+ *
+ * @returns {{key: string, label: string, group: string}[]}
+ */
+export function getCheckChoices() {
+  const fields = buildInputs()?.check?.schema?.fields ?? {};
+  const field = fields.value ?? Object.values(fields)[0];
+  let choices = field?.choices;
+  if (typeof choices === "function") choices = choices();
+  return Object.entries(choices ?? {}).map(([key, choice]) => {
+    const label = typeof choice === "object" ? choice?.label : choice;
+    const group = typeof choice === "object" ? choice?.group : null;
+    return {
+      key,
+      label: game.i18n.localize(String(label ?? key)),
+      group: group ? game.i18n.localize(String(group)) : "",
+    };
+  });
+}
+
+/**
  * Coerce a raw value into the type represented by a DataField.
  *
  * @param {foundry.data.fields.DataField} field
@@ -102,33 +154,79 @@ let activeSilentChecks = 0;
  * @param {boolean} [options.silent]       Whether to suppress chat output for the check, including
  *   roll messages the system posts shortly after the check resolves.
  * @param {Event} [options.event]    An optional originating event.
+ * @param {string} [options.rollMode]      A message visibility mode (a key of CONFIG.ChatMessage.modes)
+ *   applied to the chat messages the check creates.
+ * @param {boolean} [options.advantage]    Roll with advantage, when the system supports it.
+ * @param {boolean} [options.disadvantage] Roll with disadvantage, when the system supports it.
  * @returns {Promise<{canceled: boolean, result: number|null, target: number|null,
  *   success: boolean|null, levelOfSuccess: number|null, criticalSuccess: boolean,
- *   criticalFailure: boolean}>}    The standardized check result.
+ *   criticalFailure: boolean, message: ChatMessage|null, rolls: Roll[]}>}    The standardized
+ *   check result, with the roll chat message the check produced (unsaved when silent) and its rolls.
  */
 export async function processCheck(actor, value, options = {}) {
   const inputs = parse(value);
   const iface = getTestsInterface();
-  if (!options.silent) return iface.processCheck(actor, inputs, options);
+  return withChatCapture(actor, options, (checkOptions) => iface.processCheck(actor, inputs, checkOptions));
+}
 
-  const suppressedMessages = [];
-  options = { ...options, suppressedMessages };
+/**
+ * Run a roll for an actor with the generic chat handling of checks: `silent`
+ * suppresses the chat messages the current user creates meanwhile, `rollMode`
+ * applies a message visibility mode to them, and the roll chat message they
+ * produced is added to the result with its rolls.
+ *
+ * @param {Actor} actor
+ * @param {Object} options          The check options (`silent`, `rollMode`, ...).
+ * @param {Function} run            `(options) => Promise<Object>` performing the roll with the effective options.
+ * @returns {Promise<Object>}       The result of `run`, with `message` and `rolls`.
+ */
+export async function withChatCapture(actor, options, run) {
+  const { silent, rollMode } = options;
+  const messages = [];
+  if (silent) options = { ...options, suppressedMessages: messages };
+
   let settled = false;
-  const hook = (message) => {
-    if ((message.author?.id ?? message.author) !== game.user.id) return;
-    if (settled && (activeSilentChecks > 0 || !message.rolls?.length)) return;
-    suppressedMessages.push(message);
+  const isOwn = (message) => (message.author?.id ?? message.author) === game.user.id;
+  const preCreate = (message) => {
+    if (!isOwn(message)) return;
+    if (settled && ((silent && activeSilentChecks > 0) || !message.rolls?.length)) return;
+    if (rollMode) message.applyMode(rollMode);
+    if (!silent) return;
+    messages.push(message);
     return false;
   };
-  Hooks.on("preCreateChatMessage", hook);
-  activeSilentChecks++;
+  const create = (message) => {
+    if (!settled && isOwn(message)) messages.push(message);
+  };
+
+  const preCreateId = (silent || rollMode) ? Hooks.on("preCreateChatMessage", preCreate) : null;
+  const createId = silent ? null : Hooks.on("createChatMessage", create);
+  if (silent) activeSilentChecks++;
   try {
-    return await iface.processCheck(actor, inputs, options);
+    const result = await run(options);
+    if (!silent && result && !result.canceled && !result.message) await waitForMessage(actor, messages);
+    return withMessage(result, actor, messages);
   } finally {
-    activeSilentChecks--;
+    if (silent) activeSilentChecks--;
     settled = true;
-    setTimeout(() => Hooks.off("preCreateChatMessage", hook), LATE_ROLL_MESSAGE_MS);
+    if (createId !== null) Hooks.off("createChatMessage", createId);
+    if (preCreateId !== null) setTimeout(() => Hooks.off("preCreateChatMessage", preCreateId), LATE_ROLL_MESSAGE_MS);
   }
+}
+
+async function waitForMessage(actor, messages) {
+  const found = () => messages.some((m) => m.rolls?.length || m.speaker?.actor === actor.id);
+  for (let waited = 0; waited < LATE_ROLL_MESSAGE_MS && !found(); waited += 50) {
+    await new Promise((resolve) => setTimeout(resolve, 50));
+  }
+}
+
+function withMessage(result, actor, messages) {
+  if (!result || typeof result !== "object") return result;
+  const rolled = messages.filter((message) => message.rolls?.length);
+  const own = (list) => list.findLast((m) => m.speaker?.actor === actor.id);
+  const message = result.message ?? own(rolled) ?? rolled.at(-1) ?? own(messages) ?? null;
+  return { ...result, message, rolls: result.rolls ?? message?.rolls ?? [] };
 }
 
 /**
@@ -142,15 +240,24 @@ export async function processCheck(actor, value, options = {}) {
  *   - `element.inputs` A typed object keyed by input name, ready to be
  *                      passed to the system's `processCheck`.
  *
- * A `change` event (bubbles, composed) with detail `{value, inputs}` is
- * dispatched whenever the collected data changes.
+ * Like a native control, it dispatches `input` events while a value is being
+ * edited and one `change` event when it is committed (bubbles, composed, detail
+ * `{value, inputs}`). The inner controls' own events stay inside the element,
+ * so a form listening for `change` submits once per edit.
  */
 export class TestsInterfaceElement extends HTMLElement {
+  static formAssociated = true;
+
   #fields = [];
 
   constructor() {
     super();
     this.classList.add("form-fields");
+  }
+
+  /** The form field name, read from the `name` attribute. */
+  get name() {
+    return this.getAttribute("name");
   }
 
   /** The collected inputs as a single "key=value|key=value" string. */
@@ -159,6 +266,11 @@ export class TestsInterfaceElement extends HTMLElement {
   }
 
   set value(value) {
+    this.#apply(value);
+    this.#emit();
+  }
+
+  #apply(value) {
     const raw = {};
     if (value) {
       for (const pair of String(value).split("|")) {
@@ -173,8 +285,6 @@ export class TestsInterfaceElement extends HTMLElement {
       const rawValue = raw[entry.single ? entry.key : `${entry.key}.${entry.name}`];
       if (rawValue !== undefined) entry.control.value = rawValue;
     }
-
-    this.#emit();
   }
 
   /** The collected inputs as a typed object ready for processCheck. */
@@ -196,6 +306,7 @@ export class TestsInterfaceElement extends HTMLElement {
   /** @override */
   connectedCallback() {
     this.#render();
+    if (this.hasAttribute("value")) this.#apply(this.getAttribute("value"));
   }
 
   /* -------------------------------------------- */
@@ -224,8 +335,15 @@ export class TestsInterfaceElement extends HTMLElement {
         const field = modelFields[name];
         const group = field.toFormGroup({ localize: true, stacked: true }, { blank: "" });
         const control = group.querySelector("input, select, textarea");
-        control?.addEventListener("input", () => this.#emit());
-        control?.addEventListener("change", () => this.#emit());
+        control?.removeAttribute("name");
+        control?.addEventListener("input", (event) => {
+          event.stopPropagation();
+          this.#emit("input");
+        });
+        control?.addEventListener("change", (event) => {
+          event.stopPropagation();
+          this.#emit();
+        });
         this.append(...group.children);
         this.#fields.push({ key, name, single, field, control });
       }
@@ -233,8 +351,8 @@ export class TestsInterfaceElement extends HTMLElement {
     this.#emit();
   }
 
-  #emit() {
-    this.dispatchEvent(new CustomEvent("change", {
+  #emit(type = "change") {
+    this.dispatchEvent(new CustomEvent(type, {
       bubbles: true,
       composed: true,
       detail: {
