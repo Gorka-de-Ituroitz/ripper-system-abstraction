@@ -20,6 +20,17 @@ export default async function gurps() {
     set: (item, value) => ({ [`system.eqt.${key}`]: String(value) }),
   });
 
+  // eqt.cost is usually a number but imports/edits can leave strings such as "1,200" or "$50".
+  const costField = {
+    get: (item) => {
+      const value = item.system.eqt?.cost;
+      if (typeof value === "number") return value;
+      const cost = Number(String(value ?? "").replace(/[$,\s]/g, ""));
+      return value === "" || value == null || !Number.isFinite(cost) ? undefined : cost;
+    },
+    set: (item, value) => ({ "system.eqt.cost": value }),
+  };
+
   class GURPSCheckInput extends DataModel {
     static defineSchema() {
       return {
@@ -90,7 +101,7 @@ export default async function gurps() {
 
       item: {
         single: {
-          value: "eqt.cost",
+          value: costField,
           denomination: "$",
         },
 
