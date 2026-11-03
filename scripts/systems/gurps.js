@@ -73,7 +73,6 @@ export default async function gurps() {
       temporary: "",
       minimum: "HP.min",
 
-      useWounds: false,
       wounds: "",
       maximumWounds: "",
     },

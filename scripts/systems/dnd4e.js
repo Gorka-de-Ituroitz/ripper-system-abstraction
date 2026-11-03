@@ -66,7 +66,6 @@ export default async function dnd4e() {
       temporary: "attributes.temphp.value",
       minimum: "attributes.hp.min",
 
-      useWounds: false,
       wounds: "",
       maximumWounds: "",
     },

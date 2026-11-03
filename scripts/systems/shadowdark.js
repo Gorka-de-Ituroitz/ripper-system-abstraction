@@ -64,7 +64,6 @@ export default async function shadowdark() {
       temporary: "",
       minimum: "",
 
-      useWounds: false,
       wounds: "",
       maximumWounds: "",
     },

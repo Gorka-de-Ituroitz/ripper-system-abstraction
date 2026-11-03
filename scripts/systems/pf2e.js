@@ -73,7 +73,6 @@ export default async function pf2e() {
       temporary: "attributes.hp.temp",
       minimum: "",
 
-      useWounds: false,
       wounds: "",
       maximumWounds: "",
     },

@@ -46,7 +46,6 @@ export default async function castlesAndCrusades() {
       temporary: "",
       minimum: "",
 
-      useWounds: false,
       wounds: "",
       maximumWounds: "",
     },

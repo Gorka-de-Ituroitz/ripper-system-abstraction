@@ -33,7 +33,6 @@ export default async function vaesen() {
       temporary: "",
       minimum: "",
 
-      useWounds: false,
       wounds: "",
       maximumWounds: "",
     },

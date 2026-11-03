@@ -68,7 +68,6 @@ export default async function swade() {
       temporary: "",
       minimum: "",
 
-      useWounds: true,
       wounds: "wounds.value",
       maximumWounds: "wounds.max",
     },

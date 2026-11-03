@@ -71,7 +71,6 @@ export default async function a5e() {
       temporary: "attributes.hp.temp",
       minimum: "",
 
-      useWounds: false,
       wounds: "",
       maximumWounds: "",
     },

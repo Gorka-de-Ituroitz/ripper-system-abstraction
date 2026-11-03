@@ -46,7 +46,6 @@ export default async function daggerheart() {
       temporary: "",
       minimum: "",
 
-      useWounds: false,
       wounds: "",
       maximumWounds: "",
 

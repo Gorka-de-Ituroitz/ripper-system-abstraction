@@ -107,7 +107,6 @@ export default async function demonlord() {
       temporary: "",
       minimum: "",
 
-      useWounds: false,
       wounds: "",
       maximumWounds: "",
 

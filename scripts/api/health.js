@@ -14,9 +14,34 @@ function isInverted(dp) {
   return healthConfig(dp).invert === true;
 }
 
-function isWoundMapped(dp) {
+const warnedMissingPrimary = new WeakSet();
+
+/**
+ * The primary health track: "health" (`current`/`maximum`) or "wounds"
+ * (`wounds`/`maximumWounds`). Inferred when only one track is mapped; when
+ * both are, the adapter must set `health.primary`.
+ *
+ * @param {Object} dp
+ * @returns {"health"|"wounds"|null}
+ */
+function primaryTrack(dp) {
   const cfg = healthConfig(dp);
-  return !cfg.current && cfg.useWounds === true && !!cfg.wounds;
+  if (cfg.primary === "health" || cfg.primary === "wounds") return cfg.primary;
+  const hasHealth = !!cfg.current;
+  const hasWounds = !!cfg.wounds;
+  if (hasHealth && hasWounds && !warnedMissingPrimary.has(cfg)) {
+    warnedMissingPrimary.add(cfg);
+    console.warn(
+      `[Ripper System Abstraction] ${game.system.id} maps both health and wounds tracks but does not set health.primary; defaulting to "health".`,
+    );
+  }
+  if (hasHealth) return "health";
+  if (hasWounds) return "wounds";
+  return null;
+}
+
+function isWoundMapped(dp) {
+  return primaryTrack(dp) === "wounds";
 }
 
 function currentValue(actor, dp) {
@@ -114,12 +139,15 @@ export const health = {
   },
 
   /**
-   * The Actor's effective health as a normalized value between 0 and 1.
+   * The Actor's effective health on its primary track as a normalized value
+   * between 0 and 1.
    *
    * @param {Actor} actor
+   * @param {Object} [options]
+   * @param {boolean} [options.temporary=true]  Include temporary health.
    * @returns {number|null}
    */
-  getPercent(actor) {
+  getPercent(actor, { temporary = true } = {}) {
     const dp = resolveDataPaths(actor);
     if (isWoundMapped(dp)) {
       const maximum = numeric(maximumWoundsValue(actor, dp));
@@ -130,7 +158,8 @@ export const health = {
     const maximum = numeric(maximumValue(actor, dp));
     const total = effectiveCurrent(actor, dp);
     if (!(maximum > 0) || total == null) return null;
-    return Math.clamp((total + effectiveTemporary(actor, dp)) / maximum, 0, 1);
+    const bonus = temporary ? effectiveTemporary(actor, dp) : 0;
+    return Math.clamp((total + bonus) / maximum, 0, 1);
   },
 
   /**

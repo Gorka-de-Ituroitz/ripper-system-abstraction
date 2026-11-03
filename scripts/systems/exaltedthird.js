@@ -60,7 +60,6 @@ export default async function exaltedthird() {
       temporary: "",
       minimum: "",
 
-      useWounds: false,
       wounds: "",
       maximumWounds: "",
     },

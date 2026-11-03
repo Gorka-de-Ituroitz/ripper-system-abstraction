@@ -67,7 +67,6 @@ export default async function anarchy() {
       temporary: "",
       minimum: "",
 
-      useWounds: false,
       wounds: "",
       maximumWounds: "",
 

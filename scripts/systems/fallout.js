@@ -36,7 +36,6 @@ export default async function fallout() {
       temporary: "",
       minimum: "",
 
-      useWounds: false,
       wounds: "",
       maximumWounds: "",
     },

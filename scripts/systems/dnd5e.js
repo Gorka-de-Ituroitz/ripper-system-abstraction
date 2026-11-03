@@ -79,7 +79,6 @@ export default async function dnd5e() {
       temporary: "attributes.hp.temp",
       minimum: "",
 
-      useWounds: false,
       wounds: "",
       maximumWounds: "",
     },

@@ -44,7 +44,6 @@ export default async function deltagreen() {
       temporary: "",
       minimum: "health.min",
 
-      useWounds: false,
       wounds: "",
       maximumWounds: "",
     },

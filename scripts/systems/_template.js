@@ -79,14 +79,18 @@
  * minimum:
  *   Minimum possible health value, if applicable.
  *
- * useWounds:
- *   Whether the system uses a wound/injury model.
- *
  * wounds:
  *   Current wounds/injuries.
  *
  * maximumWounds:
  *   Maximum wounds/injuries.
+ *
+ * primary ("health" | "wounds"):
+ *   Which track is the actor's primary health, used by getPercent, heal and
+ *   damage. "health" uses `current`/`maximum`; "wounds" uses
+ *   `wounds`/`maximumWounds` (counting up toward the maximum). May be left
+ *   out when only one track is mapped, in which case it is inferred. Required
+ *   when both `current` and `wounds` are mapped.
  *
  * invert (optional, default false):
  *   When true, the stored `current`/`maximum` values count damage taken
@@ -312,9 +316,9 @@ export default async function systemAdapter() {
     temporary: "",
     minimum: "",
 
-    useWounds: false,
     wounds: "",
     maximumWounds: "",
+    primary: "health",
   },
 
   // -------------------------------------------------------------------------

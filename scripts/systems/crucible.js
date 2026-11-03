@@ -71,9 +71,9 @@ export default async function crucible() {
       temporary: "",
       minimum: "",
 
-      useWounds: true,
       wounds: "resources.wounds.value",
       maximumWounds: "resources.wounds.max",
+      primary: "health",
     },
 
     item: {

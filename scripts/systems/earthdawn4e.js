@@ -71,9 +71,9 @@ export default async function earthdawn4e() {
       temporary: "",
       minimum: "damage.min",
 
-      useWounds: true,
       wounds: "wounds",
       maximumWounds: "",
+      primary: "health",
 
       invert: true,
     },

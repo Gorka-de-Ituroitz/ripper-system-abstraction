@@ -15,7 +15,6 @@ export default async function customSystemBuilder() {
       temporary: "",
       minimum: "",
 
-      useWounds: false,
       wounds: "",
       maximumWounds: "",
     },

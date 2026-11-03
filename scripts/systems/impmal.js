@@ -64,9 +64,9 @@ export default async function impmal() {
       temporary: "",
       minimum: "",
 
-      useWounds: true,
       wounds: "combat.criticals.value",
       maximumWounds: "combat.criticals.max",
+      primary: "health",
     },
 
     item: {

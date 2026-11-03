@@ -57,7 +57,6 @@ export default async function wildtalents() {
       temporary: "",
       minimum: "",
 
-      useWounds: true,
       wounds: "silhouette",
       maximumWounds: "",
     },

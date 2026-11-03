@@ -55,7 +55,6 @@ export default async function CoC7() {
     temporary: "",
     minimum: "",
 
-    useWounds: false,
     wounds: "",
     maximumWounds: "",
   },

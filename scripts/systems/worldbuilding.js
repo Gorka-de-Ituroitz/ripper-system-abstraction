@@ -15,7 +15,6 @@ export default async function worldbuilding() {
       temporary: "",
       minimum: "health.min",
 
-      useWounds: false,
       wounds: "",
       maximumWounds: "",
     },

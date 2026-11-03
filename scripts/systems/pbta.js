@@ -33,7 +33,6 @@ export default async function pbta() {
       temporary: "",
       minimum: "",
 
-      useWounds: false,
       wounds: "",
       maximumWounds: "",
     },

@@ -71,7 +71,6 @@ export default async function sfrpg() {
       temporary: "attributes.hp.temp",
       minimum: "",
 
-      useWounds: false,
       wounds: "",
       maximumWounds: "",
     },

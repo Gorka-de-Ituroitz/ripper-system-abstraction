@@ -45,9 +45,9 @@ export default async function starwarsffg() {
       temporary: "",
       minimum: "",
 
-      useWounds: true,
       wounds: "stats.wounds.value",
       maximumWounds: "stats.wounds.max",
+      primary: "health",
 
       invert: true,
     },

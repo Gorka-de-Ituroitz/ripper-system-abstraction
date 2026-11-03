@@ -52,7 +52,6 @@ export default async function dsa5() {
       temporary: "",
       minimum: "",
 
-      useWounds: false,
       wounds: "",
       maximumWounds: "",
     },

@@ -45,9 +45,9 @@ export default async function alienrpg() {
       temporary: "",
       minimum: "",
 
-      useWounds: true,
       wounds: "general.critInj.value",
       maximumWounds: "",
+      primary: "health",
     },
 
     item: {

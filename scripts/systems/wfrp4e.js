@@ -92,9 +92,9 @@ export default async function wfrp4e() {
       temporary: "",
       minimum: "",
 
-      useWounds: true,
       wounds: "status.criticalWounds.value",
       maximumWounds: "status.criticalWounds.max",
+      primary: "health",
     },
 
     item: {

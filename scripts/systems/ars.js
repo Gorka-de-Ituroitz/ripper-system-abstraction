@@ -54,7 +54,6 @@ export default async function ars() {
       temporary: "attributes.hp.temp.hp.value",
       minimum: "attributes.hp.min",
 
-      useWounds: false,
       wounds: "",
       maximumWounds: "",
     },

@@ -46,7 +46,6 @@ export default async function bitd() {
       temporary: "",
       minimum: "",
 
-      useWounds: false,
       wounds: "",
       maximumWounds: "",
     },

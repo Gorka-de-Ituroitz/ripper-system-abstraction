@@ -97,7 +97,6 @@ export default async function cyberpunk2020() {
       temporary: "",
       minimum: "",
 
-      useWounds: true,
       wounds: "damage",
       maximumWounds: () => 40,
     },
