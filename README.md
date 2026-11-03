@@ -13,6 +13,7 @@ This module uses Agentic workflows to parse, crawl, analyze and test game system
 | Anarchy | `anarchy` |
 | Advanced Roleplaying System (ARS) | `ars` |
 | Blades in the Dark | `bitd` |
+| Cairn 2e | `cairn2e` |
 | Castles & Crusades | `castles-and-crusades` |
 | Call of Cthulhu 7th Edition | `CoC7` |
 | Crucible | `crucible` |
@@ -33,6 +34,7 @@ This module uses Agentic workflows to parse, crawl, analyze and test game system
 | Pathfinder 2e | `pf2e` |
 | Starfinder | `sfrpg` |
 | Shadowdark | `shadowdark` |
+| Shadowrun 5e | `shadowrun5e` |
 | Star Wars FFG | `starwarsffg` |
 | Savage Worlds Adventure Edition | `swade` |
 | Vaesen | `vaesen` |

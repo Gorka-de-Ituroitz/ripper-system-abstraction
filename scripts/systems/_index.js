@@ -3,6 +3,7 @@ import alienrpg from "./alienrpg.js";
 import anarchy from "./anarchy.js";
 import ars from "./ars.js";
 import bitd from "./bitd.js";
+import cairn2e from "./cairn2e.js";
 import castlesAndCrusades from "./castles-and-crusades.js";
 import CoC7 from "./CoC7.js";
 import crucible from "./crucible.js";
@@ -23,6 +24,7 @@ import pbta from "./pbta.js";
 import pf2e from "./pf2e.js";
 import sfrpg from "./sfrpg.js";
 import shadowdark from "./shadowdark.js";
+import shadowrun5e from "./shadowrun5e.js";
 import starwarsffg from "./starwarsffg.js";
 import swade from "./swade.js";
 import vaesen from "./vaesen.js";
@@ -36,6 +38,7 @@ const factories = {
   anarchy,
   ars,
   bitd,
+  cairn2e,
   "castles-and-crusades": castlesAndCrusades,
   CoC7,
   crucible,
@@ -56,6 +59,7 @@ const factories = {
   pf2e,
   sfrpg,
   shadowdark,
+  shadowrun5e,
   starwarsffg,
   swade,
   vaesen,
