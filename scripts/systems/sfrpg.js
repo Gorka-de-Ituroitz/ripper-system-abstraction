@@ -112,7 +112,7 @@ export default async function sfrpg() {
       },
 
       denominations: {
-        credit: { value: 1, label: "SFRPG.Currencies.Credits" },
+        credit: { value: 1, label: "SFRPG.Currencies.Credits", abbreviation: "SFRPG.Combat.Difficulty.Units.Credits" },
         upb: { value: 1, label: "SFRPG.Currencies.UPBs", change: false },
       },
     },

@@ -116,6 +116,7 @@ export default async function ars() {
       denominations: Object.fromEntries(Object.entries(coinValues).map(([key, copper]) => [key, {
         value: copper / coinValues.gp,
         label: ARS.currency[key],
+        abbreviation: `ARS.currency.abbr.${key}`,
         icon: ARS.icons?.general?.currency?.[key] ?? null,
         change: key !== "ep",
       }])),

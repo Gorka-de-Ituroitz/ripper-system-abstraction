@@ -139,10 +139,10 @@ export default async function pf2e() {
       },
 
       denominations: {
-        cp: { value: 1 },
-        sp: { value: 10 },
-        gp: { value: 100 },
-        pp: { value: 1000 },
+        cp: { value: 1, abbreviation: "PF2E.CurrencyAbbreviations.cp" },
+        sp: { value: 10, abbreviation: "PF2E.CurrencyAbbreviations.sp" },
+        gp: { value: 100, abbreviation: "PF2E.CurrencyAbbreviations.gp" },
+        pp: { value: 1000, abbreviation: "PF2E.CurrencyAbbreviations.pp" },
       },
     },
 

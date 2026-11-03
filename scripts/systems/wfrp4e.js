@@ -148,9 +148,9 @@ export default async function wfrp4e() {
       },
 
       denominations: {
-        bp: { value: 1, label: "NAME.BP" },
-        ss: { value: 12, label: "NAME.SS" },
-        gc: { value: 240, label: "NAME.GC" },
+        bp: { value: 1, label: "NAME.BP", abbreviation: "MARKET.Abbrev.BP" },
+        ss: { value: 12, label: "NAME.SS", abbreviation: "MARKET.Abbrev.SS" },
+        gc: { value: 240, label: "NAME.GC", abbreviation: "MARKET.Abbrev.GC" },
       },
     },
 

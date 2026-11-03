@@ -73,7 +73,7 @@ export default async function cairn2e() {
       },
 
       denominations: {
-        gp: { value: 1 },
+        gp: { value: 1, abbreviation: "CAIRN.GoldAbbrev" },
       },
     },
 

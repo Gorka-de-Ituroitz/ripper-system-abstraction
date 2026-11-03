@@ -28,6 +28,16 @@ function denominationRatio(config, name) {
   return typeof entry?.value === "number" ? entry.value : 1;
 }
 
+function localizeLabel(key) {
+  return game.i18n.localize(key).replace(/\s*:\s*$/, "");
+}
+
+function denominationAbbreviation(id, entry) {
+  if (entry?.abbreviation) return localizeLabel(entry.abbreviation);
+  if (!entry?.label) return id.toUpperCase();
+  return localizeLabel(entry.label).split(/\s+/).filter(Boolean).map((word) => word[0]).join("");
+}
+
 function toBase(config, amounts) {
   let total = 0;
   for (const [name, amount] of Object.entries(amounts)) {
@@ -130,14 +140,18 @@ export const currency = {
    * value. `value` is the worth of one unit expressed in the base
    * denomination.
    *
-   * @returns {{id: string, label: string, icon: string|null, value: number, isBase: boolean}[]}
+   * `abbreviation` falls back to the initials of an explicit `label`, then
+   * to the uppercased id.
+   *
+   * @returns {{id: string, label: string, abbreviation: string, icon: string|null, value: number, isBase: boolean}[]}
    */
   getDenominations() {
     const config = currencyConfig(resolveDataPaths());
     return Object.entries(config.denominations ?? {})
       .map(([id, entry]) => ({
         id,
-        label: entry?.label ? game.i18n.localize(entry.label).replace(/\s*:\s*$/, "") : id.toUpperCase(),
+        label: entry?.label ? localizeLabel(entry.label) : id.toUpperCase(),
+        abbreviation: denominationAbbreviation(id, entry),
         icon: entry?.icon ?? null,
         value: denominationRatio(config, id),
         isBase: id === config.base,

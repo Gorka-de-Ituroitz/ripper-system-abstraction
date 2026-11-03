@@ -122,6 +122,7 @@ export default async function crucible() {
       denominations: Object.fromEntries(Object.entries(SYSTEM.ACTOR.CURRENCY_DENOMINATIONS).map(([key, entry]) => [key, {
           value: entry.multiplier,
           label: entry.label,
+          abbreviation: entry.abbreviation,
           icon: entry.icon ?? null,
         }])),
     },

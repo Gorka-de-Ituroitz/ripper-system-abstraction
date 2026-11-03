@@ -381,8 +381,8 @@ export default async function systemAdapter() {
     //
     // Add `change: false` to a denomination that may be spent but should
     // never be handed out as change (e.g. dnd5e electrum). Optional `label`
-    // (i18n key or text) and `icon` (image path) are exposed through
-    // `currency.getDenominations()`.
+    // and `abbreviation` (i18n keys or text) and `icon` (image path) are
+    // exposed through `currency.getDenominations()`.
     denominations: {},
   },
 

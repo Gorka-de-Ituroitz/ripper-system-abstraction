@@ -125,6 +125,7 @@ export default async function dnd5e() {
       denominations: Object.fromEntries(Object.entries(CONFIG.DND5E.currencies).map(([key, entry]) => [key, {
         value: 1 / entry.conversion,
         label: entry.label,
+        abbreviation: entry.abbreviation,
         icon: entry.icon ?? null,
         change: key !== "ep",
       }])),

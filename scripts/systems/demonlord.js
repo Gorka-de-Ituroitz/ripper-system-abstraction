@@ -146,9 +146,9 @@ export default async function demonlord() {
       },
 
       denominations: {
-        gc: { value: 1, label: "DL.WealthCoinsGC" },
-        ss: { value: 0.1, label: "DL.WealthCoinsSS" },
-        cp: { value: 0.01, label: "DL.WealthCoinsCP" },
+        gc: { value: 1, label: "DL.WealthCoinsGC", abbreviation: "DL.MacroWealthManager.CoinsGC" },
+        ss: { value: 0.1, label: "DL.WealthCoinsSS", abbreviation: "DL.MacroWealthManager.CoinsSS" },
+        cp: { value: 0.01, label: "DL.WealthCoinsCP", abbreviation: "DL.MacroWealthManager.CoinsCP" },
         bits: { value: 0.001, label: "DL.WealthCoinsBits" },
       },
     },

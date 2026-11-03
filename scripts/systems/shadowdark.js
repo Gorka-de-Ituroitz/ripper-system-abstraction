@@ -104,9 +104,9 @@ export default async function shadowdark() {
       },
 
       denominations: {
-        cp: { value: 0.01 },
-        sp: { value: 0.1 },
-        gp: { value: 1 },
+        cp: { value: 0.01, abbreviation: "SHADOWDARK.coins.cp" },
+        sp: { value: 0.1, abbreviation: "SHADOWDARK.coins.sp" },
+        gp: { value: 1, abbreviation: "SHADOWDARK.coins.gp" },
       },
     },
 
