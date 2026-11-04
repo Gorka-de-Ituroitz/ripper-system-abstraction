@@ -1,7 +1,12 @@
 const { DataModel } = foundry.abstract;
 const fields = foundry.data.fields;
 
+const COIN_VALUES = { coins: 1, handfuls: 10, bags: 100, chests: 1000 };
+
 export default async function daggerheart() {
+  const homebrewCurrency = game.settings.get(CONFIG.DH.id, CONFIG.DH.SETTINGS.gameSettings.Homebrew)?.currency ?? {};
+  const coins = Object.entries(COIN_VALUES).filter(([key]) => homebrewCurrency[key]?.enabled !== false);
+  const [base = "coins", baseValue = 1] = coins[0] ?? [];
 
   class DaggerheartCheckInput extends DataModel {
     static defineSchema() {
@@ -64,15 +69,10 @@ export default async function daggerheart() {
     },
 
     currency: {
-      base: "coins",
+      base,
 
       actor: {
-        denominations: {
-          coins: "gold.coins",
-          handfuls: "gold.handfuls",
-          bags: "gold.bags",
-          chests: "gold.chests",
-        },
+        denominations: Object.fromEntries(coins.map(([key]) => [key, `gold.${key}`])),
       },
 
       item: {
@@ -84,12 +84,9 @@ export default async function daggerheart() {
         denominations: {},
       },
 
-      denominations: {
-        coins: { value: 1 },
-        handfuls: { value: 10 },
-        bags: { value: 100 },
-        chests: { value: 1000 },
-      },
+      denominations: Object.fromEntries(
+        coins.map(([key, value]) => [key, { value: value / baseValue, label: homebrewCurrency[key]?.label || undefined }]),
+      ),
     },
 
     experience: {
