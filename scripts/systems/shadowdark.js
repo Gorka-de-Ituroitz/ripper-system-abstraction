@@ -48,6 +48,30 @@ export default async function shadowdark() {
     };
   }
 
+  const SPELL_ITEM_TYPES = [
+    { action: "Potion", icon: "fas fa-prescription-bottle", label: "SHADOWDARK.item.potion.label" },
+    { action: "Scroll", icon: "fas fa-scroll", label: "SHADOWDARK.item.scroll.label", default: true },
+    { action: "Spell", icon: "fa-solid fa-hand-sparkles", label: "SHADOWDARK.item.spell.label" },
+    { action: "Wand", icon: "fa-solid fa-wand-magic-sparkles", label: "SHADOWDARK.item.wand.label" },
+  ];
+
+  async function itemFromSpell(spell, { dialog }) {
+    const type = dialog
+      ? await foundry.applications.api.DialogV2.wait({
+        window: { title: game.i18n.format("SHADOWDARK.dialog.item.create_from_spell", { spellName: spell.name }) },
+        content: await foundry.applications.handlebars.renderTemplate(
+          "systems/shadowdark/templates/dialog/create-item-from-spell.hbs",
+          { spellName: spell.name, isGM: game.user.isGM },
+        ),
+        buttons: SPELL_ITEM_TYPES,
+        rejectClose: false,
+      })
+      : "Scroll";
+    if (!type) return null;
+    if (type === "Spell") return spell;
+    return globalThis.shadowdark.utils.createItemFromSpell(type, spell);
+  }
+
   return {
     dataPaths: {
     actor: {
@@ -77,6 +101,11 @@ export default async function shadowdark() {
 
       uses: "uses.available",
       maximumUses: "uses.max",
+
+      fromSpell: {
+        isSpell: (item) => item.type === "Spell",
+        create: itemFromSpell,
+      },
     },
 
     currency: {

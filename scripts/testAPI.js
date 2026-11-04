@@ -529,6 +529,21 @@ function testItemWeight(item) {
   }
 }
 
+async function testItemFromSpell(actor) {
+  const spell = [...(actor.items ?? []), ...game.items].find((i) => api.item.canCreateFromSpell(i));
+  if (!spell) {
+    skip("item.createFromSpell", "no supported spell found on the actor or in the world");
+    return;
+  }
+  const data = await api.item.createFromSpell(spell, { dialog: false });
+  const created = data && !(data instanceof Item) ? new Item.implementation(data) : null;
+  if (created) {
+    pass("item.createFromSpell", `${spell.name} -> ${created.name} (${created.type})`);
+  } else {
+    fail("item.createFromSpell", `no item data returned for ${spell.name}`);
+  }
+}
+
 /* ------------------------------------------------------------------------- */
 /* actor + experience                                                        */
 /* ------------------------------------------------------------------------- */
@@ -698,6 +713,7 @@ export async function runAPITests(actor) {
   await testItemUses(usesItem);
   await testItemAttunement(attunementItem);
   testItemWeight(weightItem);
+  await testItemFromSpell(actor);
   await testTestsInterface(actor);
 
   return printSummary();

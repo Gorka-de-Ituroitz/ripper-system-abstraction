@@ -344,4 +344,38 @@ export const item = {
     const maximum = getPath(item, maximumSpec);
     return executeUpdate(item, setPath(item, usesSpec, maximum), options);
   },
+
+  // ---------------------------------------------------------------
+  // Items from spells
+  // ---------------------------------------------------------------
+
+  /**
+   * Whether the system can turn this Item (a spell) into another item, such
+   * as a scroll, wand or potion.
+   *
+   * @param {Item} item
+   * @returns {boolean}
+   */
+  canCreateFromSpell(item) {
+    const cfg = itemConfig(resolveDataPaths(item)).fromSpell;
+    return !!cfg && !!cfg.isSpell(item);
+  },
+
+  /**
+   * Create item data from a spell the way the system does when a spell is
+   * dropped into an inventory (e.g. a spell scroll), showing the system's
+   * own choices unless `options.dialog` is false. Nothing is created.
+   *
+   * @param {Item} spell
+   * @param {Object} [options]
+   * @param {boolean} [options.dialog=true]
+   * @returns {Promise<Object|Item|null>} The new item's source data, the
+   *   spell itself when the user chose to keep it as a spell, or null when
+   *   the user canceled.
+   */
+  async createFromSpell(spell, options = {}) {
+    const cfg = itemConfig(resolveDataPaths(spell)).fromSpell;
+    if (!cfg?.isSpell(spell)) throw unsupported(spell, "item.createFromSpell", "item is not a supported spell");
+    return (await cfg.create(spell, { dialog: true, ...options })) ?? null;
+  },
 };

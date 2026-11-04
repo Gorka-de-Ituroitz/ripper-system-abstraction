@@ -3,6 +3,49 @@ const fields = foundry.data.fields;
 
 export default async function a5e() {
 
+  function scrollFromSpell(spell) {
+    const { attackBonus, cost, craftingComponent, saveDC, rarity } = CONFIG.A5E.scrollData[spell.system.level];
+    const effects = [];
+    const actions = {};
+    for (const source of spell.actions.values()) {
+      const action = { ...source };
+      action.effects = [...(source.effects ?? [])].flatMap((id) => {
+        const effect = spell.effects.get(id)?.toObject();
+        if (!effect) return [];
+        effect._id = foundry.utils.randomID();
+        effects.push(effect);
+        return [effect._id];
+      });
+      action.prompts = Object.fromEntries(Object.entries(action.prompts ?? {}).map(([id, prompt]) => {
+        const copy = { ...prompt };
+        if (copy.type === "savingThrow") copy.saveDC = { ...copy.saveDC, type: "custom", bonus: saveDC };
+        return [id, copy];
+      }));
+      action.rolls = Object.fromEntries(Object.entries(action.rolls ?? {}).map(([id, roll]) => {
+        const copy = { ...roll };
+        if (copy.type === "attack") Object.assign(copy, { ability: "none", bonus: String(attackBonus) });
+        delete copy.scaling;
+        return [id, copy];
+      }));
+      action.consumers = { [foundry.utils.randomID()]: { itemId: "", quantity: 1, type: "quantity" } };
+      actions[foundry.utils.randomID()] = action;
+    }
+    return {
+      name: `Spell Scroll (${spell.name})`,
+      img: "icons/sundries/scrolls/scroll-writing-brown-gold.webp",
+      type: "object",
+      effects,
+      system: {
+        actions,
+        craftingComponents: craftingComponent,
+        description: spell.system.description,
+        price: { value: cost.value, denomination: cost.denomination, special: "" },
+        objectType: "consumable",
+        rarity,
+      },
+    };
+  }
+
   class A5ECheckInput extends DataModel {
     static defineSchema() {
       return {
@@ -87,6 +130,11 @@ export default async function a5e() {
 
       uses: "uses.value",
       maximumUses: "uses.max",
+
+      fromSpell: {
+        isSpell: (item) => item.type === "spell" && !!CONFIG.A5E.scrollData?.[item.system.level],
+        create: async (spell) => scrollFromSpell(spell),
+      },
     },
 
     currency: {

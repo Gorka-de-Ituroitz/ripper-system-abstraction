@@ -55,6 +55,89 @@ export default async function pf2e() {
     };
   }
 
+  function spellItemCategories(spell) {
+    return Object.entries(CONFIG.PF2E.spellcastingItems ?? {}).filter(([, c]) => !!c?.cantripsOnly === spell.isCantrip);
+  }
+
+  function spellItemRanks(spell, category) {
+    if (!category) return [];
+    if (category.cantripsOnly) return category.compendiumUuids[1] ? [1] : [];
+    return Object.keys(category.compendiumUuids).map(Number).filter((rank) => rank >= spell.baseRank && !!category.compendiumUuids[rank]);
+  }
+
+  async function consumableFromSpell(spell, { type, rank, mystified = false }) {
+    const category = CONFIG.PF2E.spellcastingItems[type];
+    const base = await fromUuid(category?.compendiumUuids[rank]);
+    if (!base?.isOfType?.("consumable")) return null;
+    const data = base.toObject();
+    delete data._id;
+    const traits = data.system.traits;
+    traits.value = [...new Set([...traits.value, ...spell.system.traits.value])];
+    traits.rarity = spell.rarity;
+    const traditions = Object.keys(CONFIG.PF2E.magicTraditions);
+    if (traits.value.includes("magical") && traits.value.some((t) => traditions.includes(t))) traits.value.splice(traits.value.indexOf("magical"), 1);
+    traits.value.sort();
+    data.name = category.nameTemplate
+      ? game.i18n.format(category.nameTemplate, { name: spell.name, level: rank })
+      : `${type} of ${spell.name} (Rank ${rank})`;
+    const link = spell.sourceId ?? spell.uuid;
+    data.system.description.value = `<p>@UUID[${link}]{${spell.name}}</p><hr />${data.system.description.value}`;
+    if (!category.cantripsOnly) {
+      data.system.spell = foundry.utils.mergeObject(spell._source, {
+        _id: foundry.utils.randomID(),
+        system: { location: { value: null, heightenedLevel: rank } },
+      }, { inplace: false });
+    }
+    if (mystified) data.system.identification.status = "unidentified";
+    return data;
+  }
+
+  async function itemFromSpell(spell, { dialog }) {
+    const categories = spellItemCategories(spell);
+    const firstRank = (type) => spellItemRanks(spell, CONFIG.PF2E.spellcastingItems[type])[0];
+    if (!dialog) {
+      const [type] = categories.find(([t]) => firstRank(t) != null) ?? [];
+      return type ? consumableFromSpell(spell, { type, rank: firstRank(type) }) : null;
+    }
+    const { createFormGroup, createSelectInput, createCheckboxInput } = foundry.applications.fields;
+    const rankOptions = (type) => spellItemRanks(spell, CONFIG.PF2E.spellcastingItems[type]).map((r) => ({ value: String(r), label: String(r) }));
+    const [firstType] = categories[0] ?? [];
+    const typeGroup = createFormGroup({
+      label: "PF2E.SpellcastingItemCreator.ItemType",
+      localize: true,
+      input: createSelectInput({ name: "type", options: categories.map(([value, c]) => ({ value, label: c.name })), localize: true }),
+    });
+    const rankGroup = createFormGroup({
+      label: "PF2E.Item.Spell.Rank.Label",
+      localize: true,
+      input: createSelectInput({ name: "rank", options: rankOptions(firstType) }),
+    });
+    rankGroup.hidden = !!CONFIG.PF2E.spellcastingItems[firstType]?.cantripsOnly;
+    const mystifyGroup = createFormGroup({
+      label: "PF2E.identification.Mystify",
+      localize: true,
+      input: createCheckboxInput({ name: "mystified" }),
+    });
+    const result = await foundry.applications.api.DialogV2.input({
+      window: { title: "PF2E.SpellcastingItemCreator.Title", icon: "fa-solid fa-scroll" },
+      content: `<p>${game.i18n.format("PF2E.SpellcastingItemCreator.Label", { name: spell.name })}</p>${typeGroup.outerHTML}${rankGroup.outerHTML}${mystifyGroup.outerHTML}`,
+      ok: { label: "PF2E.CreateItemTitle", icon: "fa-solid fa-plus" },
+      render: (event, dialog) => {
+        const form = dialog.element.querySelector("form");
+        form.elements.type.addEventListener("change", () => {
+          const type = form.elements.type.value;
+          form.elements.rank.replaceChildren(...rankOptions(type).map(({ value, label }) => new Option(label, value)));
+          form.elements.rank.closest(".form-group").hidden = !!CONFIG.PF2E.spellcastingItems[type]?.cantripsOnly;
+        });
+      },
+      rejectClose: false,
+    });
+    if (!result) return null;
+    const rank = Number(result.rank) || firstRank(result.type);
+    if (rank == null) return null;
+    return consumableFromSpell(spell, { type: result.type, rank, mystified: !!result.mystified });
+  }
+
   return {
     dataPaths: {
     actor: {
@@ -96,6 +179,11 @@ export default async function pf2e() {
 
       uses: "uses.value",
       maximumUses: "uses.max",
+
+      fromSpell: {
+        isSpell: (item) => item.type === "spell" && !item.isRitual && spellItemCategories(item).length > 0,
+        create: itemFromSpell,
+      },
     },
 
     currency: {

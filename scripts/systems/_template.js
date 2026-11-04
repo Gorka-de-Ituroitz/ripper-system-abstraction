@@ -145,6 +145,16 @@
  * maximumUses:
  *   Maximum uses/charges.
  *
+ * fromSpell (optional object):
+ *   For systems that turn a spell dropped into an inventory into another
+ *   item (spell scrolls, wands, potions). Leave out when the system has no
+ *   such concept.
+ *   - `isSpell(item) => boolean`
+ *   - `create(spell, { dialog }) => Promise<Object|Item|null>` returns the
+ *     new item's source data, the spell itself when the user chose to keep
+ *     it as a spell, or null when canceled. With `dialog: false` it uses the
+ *     system's defaults without prompting. It must not create documents.
+ *
  * ---------------------------------------------------------------------------
  * CURRENCY
  * ---------------------------------------------------------------------------

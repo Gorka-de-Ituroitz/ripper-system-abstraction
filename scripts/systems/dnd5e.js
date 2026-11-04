@@ -95,6 +95,14 @@ export default async function dnd5e() {
       uses: "uses.value",
       usesSpent: "uses.spent",
       maximumUses: "uses.max",
+
+      fromSpell: {
+        isSpell: (item) => item.type === "spell",
+        create: async (spell, { dialog }) => {
+          const scroll = await CONFIG.Item.documentClass.createScrollFromSpell(spell, {}, { dialog });
+          return scroll?.toObject() ?? null;
+        },
+      },
     },
 
     currency: {
