@@ -1,6 +1,21 @@
 {
     "ripper-system-abstraction": {
-        "settings": {},
+        "settings": {
+            "manualConfig": {
+                "name": "Enable Manual Configuration",
+                "hint": "Adds a header button to Actor sheets that opens a form for manually setting data the game system does not provide (such as creature types). Values set this way are added to the system's own data."
+            }
+        },
+        "manualConfig": {
+            "title": "System Abstraction Configuration",
+            "button": "System Abstraction",
+            "fields": {
+                "creatureType": {
+                    "label": "Creature Types",
+                    "hint": "Additional creature types for this actor, added to any type the game system already provides."
+                }
+            }
+        },
         "app": {},
         "flags": {},
         "tests": {

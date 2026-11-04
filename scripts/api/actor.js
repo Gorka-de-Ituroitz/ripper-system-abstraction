@@ -1,4 +1,5 @@
 import { resolveDataPaths, getPath } from "./core.js";
+import { getManualConfig } from "../manualConfig.js";
 
 function actorConfig(dp) {
   return dp.actor ?? {};
@@ -30,24 +31,36 @@ function localizeLabel(value) {
 export const actor = {
   /**
    * The Actor's creature/entity types. Always an array, since some systems
-   * allow several types at once (e.g. undead + humanoid).
+   * allow several types at once (e.g. undead + humanoid). Types set through
+   * the manual configuration (`creatureType` flag) are appended.
    *
    * @param {Actor} actor
    * @returns {string[]}
    */
   getTypes(actor) {
-    return toList(getPath(actor, actorConfig(resolveDataPaths(actor)).type));
+    const types = toList(getPath(actor, actorConfig(resolveDataPaths(actor)).type));
+    const manual = toList(getManualConfig(actor, "creatureType"));
+    return [...new Set([...types, ...manual])];
   },
 
   /**
    * Every creature/entity type declared by the game system, independent of
-   * any Actor.
+   * any Actor, plus any type manually configured on a world Actor.
    *
    * @returns {{id: string, label: string}[]}
    */
   getAllTypes() {
     const choices = evaluate(actorConfig(resolveDataPaths()).typeChoices) ?? {};
-    return Object.entries(choices).map(([id, label]) => ({ id, label: localizeLabel(label) || id }));
+    const types = Object.entries(choices).map(([id, label]) => ({ id, label: localizeLabel(label) || id }));
+    const known = new Set(types.map((type) => type.id));
+    for (const actor of game.actors ?? []) {
+      for (const id of toList(getManualConfig(actor, "creatureType"))) {
+        if (known.has(id)) continue;
+        known.add(id);
+        types.push({ id, label: id });
+      }
+    }
+    return types;
   },
 
   /**

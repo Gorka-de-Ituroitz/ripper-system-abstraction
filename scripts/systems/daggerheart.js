@@ -3,6 +3,24 @@ const fields = foundry.data.fields;
 
 const COIN_VALUES = { coins: 1, handfuls: 10, bags: 100, chests: 1000 };
 
+/**
+ * Every ancestry name known to the world: compendium ancestries, world
+ * ancestry items and the ancestries currently held by actors.
+ */
+function ancestryChoices() {
+  const names = new Set();
+  for (const pack of game.packs) {
+    if (pack.documentName !== "Item") continue;
+    for (const entry of pack.index) if (entry.type === "ancestry" && entry.name) names.add(entry.name);
+  }
+  for (const item of game.items) if (item.type === "ancestry" && item.name) names.add(item.name);
+  for (const actor of game.actors) {
+    const name = actor.system?.ancestry?.name;
+    if (name) names.add(name);
+  }
+  return Object.fromEntries([...names].sort((a, b) => a.localeCompare(b)).map((name) => [name, name]));
+}
+
 export default async function daggerheart() {
   const homebrewCurrency = game.settings.get(CONFIG.DH.id, CONFIG.DH.SETTINGS.gameSettings.Homebrew)?.currency ?? {};
   const coins = Object.entries(COIN_VALUES).filter(([key]) => homebrewCurrency[key]?.enabled !== false);
@@ -37,7 +55,8 @@ export default async function daggerheart() {
   return {
     dataPaths: {
     actor: {
-      type: "",
+      type: "ancestry.name",
+      typeChoices: ancestryChoices,
       subtype: "",
       size: "size",
       sizes: () => game.settings.get(CONFIG.DH.id, CONFIG.DH.SETTINGS.gameSettings.Homebrew)?.tokenSizes ?? {},

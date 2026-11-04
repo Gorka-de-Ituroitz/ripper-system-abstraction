@@ -4,7 +4,14 @@ const SETTING_CACHE = {};
 const DEFAULT_CACHE = false;
 
 export function registerSettings() {
-    const settings = {};
+    const settings = {
+        manualConfig: {
+            scope: "world",
+            config: true,
+            type: Boolean,
+            default: false,
+        },
+    };
 
     registerSettingsArray(settings);
 }

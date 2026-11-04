@@ -7,6 +7,7 @@ import { api } from "./api/index.js";
 import { rollInitiative } from "./initiative.js";
 import { runAPITests } from "./testAPI.js";
 import { loadSystem } from "./systems/_index.js";
+import { registerManualConfigHooks } from "./manualConfig.js";
 
 export const MODULE_ID = "ripper-system-abstraction";
 
@@ -34,6 +35,7 @@ export const API = {
 
 Hooks.on("init", () => {
     registerSettings();
+    registerManualConfigHooks();
     const module = game.modules.get(MODULE_ID);
     module.API = API;
 });
