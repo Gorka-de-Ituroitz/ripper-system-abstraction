@@ -51,7 +51,7 @@ export default async function impmal() {
   return {
     dataPaths: {
     actor: {
-      type: "",
+      type: "species",
       subtype: "",
       size: "combat.size",
       level: "",
@@ -67,6 +67,8 @@ export default async function impmal() {
       wounds: "combat.criticals.value",
       maximumWounds: "combat.criticals.max",
       primary: "health",
+
+      invert: true,
     },
 
     item: {
