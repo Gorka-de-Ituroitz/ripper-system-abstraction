@@ -2,14 +2,10 @@ const { DataModel } = foundry.abstract;
 const fields = foundry.data.fields;
 
 export default async function dnd5e() {
-  const toolNames = new Map();
-  try {
-    const toolPack = game.packs?.get?.("dnd5e.equipment24");
-    if (toolPack) {
-      if (!toolPack.indexed) await toolPack.getIndex();
-      for (const entry of toolPack.index.values()) toolNames.set(entry._id, entry.name);
-    }
-  } catch (err) {}
+  const toolLabel = (key, entry) => {
+    const uuid = typeof entry === "string" ? entry : entry?.id;
+    return (uuid && fromUuidSync(uuid, { strict: false })?.name) || key.capitalize();
+  };
 
 
   class DND5ECheckInput extends DataModel {
@@ -189,9 +185,7 @@ export default async function dnd5e() {
       const tools = Object.entries({ ...CONFIG.DND5E.toolProficiencies, ...CONFIG.DND5E.vehicleTypes })
         .map(([key, label]) => ({ key, label: game.i18n.localize(label) }));
       for (const [key, entry] of Object.entries(CONFIG.DND5E.tools ?? {})) {
-        if (!entry || typeof entry !== "object" || !entry.id) continue;
-        const toolId = String(entry.id).split(".").at(-1);
-        tools.push({ key, label: toolNames.get(toolId) ?? key });
+        if (entry) tools.push({ key, label: toolLabel(key, entry) });
       }
       tools.sort((a, b) => a.label.localeCompare(b.label));
       for (const { key, label } of tools) choices[`tool.${key}`] = { label, group: group.tool };
