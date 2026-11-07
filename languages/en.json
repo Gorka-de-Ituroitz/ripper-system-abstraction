@@ -44,7 +44,9 @@
             "DCClassAverage": "Average",
             "DCClassDifficult": "Difficult",
             "DCClassVeryDifficult": "Very Difficult",
-            "DCClassNearlyImpossible": "Nearly Impossible"
+            "DCClassNearlyImpossible": "Nearly Impossible",
+            "Advantage": "Advantage",
+            "Disadvantage": "Disadvantage"
         }
     }
 }
