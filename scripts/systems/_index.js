@@ -14,6 +14,7 @@ import deltagreen from "./deltagreen.js";
 import demonlord from "./demonlord.js";
 import dnd4e from "./dnd4e.js";
 import dnd5e from "./dnd5e.js";
+import dragonbane from "./dragonbane.js";
 import dsa5 from "./dsa5.js";
 import earthdawn4e from "./earthdawn4e.js";
 import exaltedthird from "./exaltedthird.js";
@@ -31,6 +32,7 @@ import vaesen from "./vaesen.js";
 import wfrp4e from "./wfrp4e.js";
 import wildtalents from "./wildtalents.js";
 import worldbuilding from "./worldbuilding.js";
+import wrathAndGlory from "./wrath-and-glory.js";
 
 const factories = {
   a5e,
@@ -49,6 +51,7 @@ const factories = {
   demonlord,
   dnd4e,
   dnd5e,
+  dragonbane,
   dsa5,
   earthdawn4e,
   exaltedthird,
@@ -66,6 +69,7 @@ const factories = {
   wfrp4e,
   wildtalents,
   worldbuilding,
+  "wrath-and-glory": wrathAndGlory,
 };
 
 const { DataModel } = foundry.abstract;
