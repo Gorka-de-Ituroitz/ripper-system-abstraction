@@ -24,6 +24,7 @@ This module uses Agentic workflows to parse, crawl, analyze and test game system
 | Shadow of the Demon Lord | `demonlord` |
 | D&D 4th Edition | `dnd4e` |
 | D&D 5th Edition | `dnd5e` |
+| Dragonbane / Drakar och Demoner | `dragonbane` |
 | The Dark Eye 5 (DSA5) | `dsa5` |
 | Earthdawn 4th Edition | `earthdawn4e` |
 | Exalted 3rd Edition | `exaltedthird` |
@@ -41,5 +42,6 @@ This module uses Agentic workflows to parse, crawl, analyze and test game system
 | Warhammer Fantasy Roleplay 4e | `wfrp4e` |
 | Wild Talents | `wildtalents` |
 | Simple Worldbuilding | `worldbuilding` |
+| Warhammer 40,000: Wrath & Glory | `wrath-and-glory` |
 
 Systems not listed above fall back to a generic implementation (roll formula + DC checks).
